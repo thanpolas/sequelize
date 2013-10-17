@@ -164,7 +164,7 @@ describe(Support.getTestDialectTeaser("DAOFactory"), function () {
       var UserTable = this.sequelize.define('UserCol', {
         aNumber: {
           type: Sequelize.INTEGER,
-          defaultValue: defaultFunction 
+          defaultValue: defaultFunction
         }
       }, { timestamps: true })
 
@@ -268,6 +268,24 @@ describe(Support.getTestDialectTeaser("DAOFactory"), function () {
       expect(Task.build().flag).to.be.false
       done()
     })
+
+    it("returns proper defaultValues after save when setter is set", function(done) {
+      var Task = this.sequelize.define('TaskBuild', {
+        title:  {type: Sequelize.STRING(50), allowNull: false, defaultValue: ''},
+      }, {
+        setterMethods: {
+          title: function(){}
+        }
+      })
+      Task.sync({force: true}).success(function() {
+        Task.build().save().success(function(record) {
+          expect(record.title).to.be.a('string')
+          expect(record.title).to.equal('')
+          done()
+        }).error(done)
+      }).error(done)
+    })
+
 
     it("stores the passed values in a special variable", function(done) {
       var user = this.User.build({ username: 'John Wayne' })
